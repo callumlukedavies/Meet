@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.signup.SignUpTwoFragment"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/signUpCityLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp">
+
+        <TextView
+            android:id="@+id/CityTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/city_string"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:labelFor="@+id/signUpCityEditText"
+            />
+
+        <EditText
+            android:id="@+id/signUpCityEditText"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:background="@drawable/edit_text_background"
+            android:ems="10"
+            android:inputType="textCapWords"
+            android:autofillHints="name"
+            android:hint="@string/city_hint_string"
+            tools:ignore="LabelFor" />
+        <TextView
+            android:id="@+id/signUpCityInvalidTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/invalid_field_string"
+            android:textColor="#FF0000"
+            android:visibility="gone"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/signUpCountryLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="30dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/country_string"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:labelFor="@+id/signUpCountryEditText"
+            />
+
+        <EditText
+            android:id="@+id/signUpCountryEditText"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_text_background"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:ems="10"
+            android:inputType="textCapWords"
+            android:autofillHints="name"
+            android:hint="@string/country_hint_string"
+            />
+
+        <TextView
+            android:id="@+id/signUpCountryInvalidTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/invalid_field_string"
+            android:textColor="#FF0000"
+            android:visibility="gone"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/signUpJobTitleLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="30dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/job_title_string"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:labelFor="@+id/signUpJobTitleEditText"
+            />
+
+        <EditText
+            android:id="@+id/signUpJobTitleEditText"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_text_background"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:ems="10"
+            android:inputType="textCapWords"
+            android:hint="@string/job_hint_string"
+            android:importantForAutofill="no" />
+
+        <TextView
+            android:id="@+id/signUpJobTitleInvalidTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/invalid_field_string"
+            android:textColor="#FF0000"
+            android:visibility="gone"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/signUpCompanyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="30dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/company_string"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:labelFor="@+id/signUpCompanyEditText"
+            />
+
+        <EditText
+            android:id="@+id/signUpCompanyEditText"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_text_background"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:ems="10"
+            android:inputType="textCapWords"
+            android:hint="@string/company_hint_string"
+            android:importantForAutofill="no"
+            tools:ignore="LabelFor" />
+
+        <TextView
+            android:id="@+id/signUpCompanyInvalidTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/invalid_field_string"
+            android:textColor="#FF0000"
+            android:visibility="gone"
+            />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/signUpFragmentTwoButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/sign_up_continue_text"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/pink"
+        android:background="@drawable/main_button_pink"
+        />
+</LinearLayout>

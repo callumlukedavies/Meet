@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "398654412455",
+    "firebase_url": "https://meet-32ba7-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "meet-32ba7",
+    "storage_bucket": "meet-32ba7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:398654412455:android:d1ee7f3d4ec27be41b2d82",
+        "android_client_info": {
+          "package_name": "com.example.meet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "398654412455-oi9jt17e7k8m3an48nl54a5q37vlgcmp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvI6jIGOcwSQUS-uPBrpCC8jCCs7Qk-w0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "398654412455-oi9jt17e7k8m3an48nl54a5q37vlgcmp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.signup.SignUpThreeFragment"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/signUpPasswordLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="30dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/password_text"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:labelFor="@+id/signUpPasswordEditText"
+            />
+
+        <EditText
+            android:id="@+id/signUpPasswordEditText"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_text_background"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:importantForAutofill="no" />
+
+        <TextView
+            android:id="@+id/signUpPasswordInvalidTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/invalid_field_string"
+            android:textColor="#FF0000"
+            android:visibility="gone"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/signUpConfirmPasswordLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="30dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/confirm_password_text"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:labelFor="@+id/signUpConfirmPasswordEditText"
+            />
+
+        <EditText
+            android:id="@+id/signUpConfirmPasswordEditText"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_text_background"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:ems="10"
+            android:inputType="textPassword"
+            android:importantForAutofill="no" />
+
+        <TextView
+            android:id="@+id/signUpConfirmPasswordInvalidTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/invalid_field_string"
+            android:textColor="#FF0000"
+            android:visibility="gone"
+            />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="30dp"
+        android:textStyle="normal"
+        android:textColor="@color/black"
+        android:text="@string/password_description_string"
+
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/signUpFragmentThreeButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/sign_up_button_text"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/pink"
+        android:background="@drawable/main_button_pink"
+        />
+
+</LinearLayout>

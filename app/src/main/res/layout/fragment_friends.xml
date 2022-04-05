@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.friends.FriendsFragment"
+    android:orientation="vertical"
+    android:background="#F8F8F8">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/friendsFragmentFriendsButton"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="@string/friends_tab_string"
+            android:textAllCaps="false"
+            android:background="#CCCCCC"
+            />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/friendsFragmentPeopleButton"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="#DDDDDD"
+            android:text="@string/people_tab_string"
+            android:textAllCaps="false"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="5dp"
+        android:layout_margin="20dp">
+
+        <EditText
+            android:id="@+id/friendsFragmentEditText"
+            android:layout_width="0dp"
+            android:layout_weight="0.7"
+            android:layout_height="50dp"
+            android:hint="@string/type_to_search_hint_string"
+            android:padding="10dp"
+            android:layout_marginEnd="10dp"
+            android:inputType="textCapWords"
+            android:background="@drawable/edit_text_background"
+            android:layout_gravity="center"
+            android:importantForAutofill="no" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/friendsFragmentSearchButton"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="0.3"
+            android:text="@string/search_button_string"
+            android:textAllCaps="false"
+            android:layout_gravity="center"
+            android:background="@drawable/main_button_pink"
+            />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/friendsFragmentTitleTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:textSize="12sp"
+        android:text="@string/no_of_friends_string"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/friendsFragmentRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="20dp"
+        />
+
+</LinearLayout>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".view.signup.SignUpOneFragment"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/signUpFirstNameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp">
+
+        <TextView
+            android:id="@+id/FirstNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/first_name_text"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:labelFor="@+id/signUpFirstNameEditText"
+            />
+
+        <EditText
+            android:id="@+id/signUpFirstNameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:background="@drawable/edit_text_background"
+            android:ems="10"
+            android:inputType="textCapWords"
+            android:autofillHints="name"
+            />
+        <TextView
+            android:id="@+id/signUpFirstNameInvalidTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/invalid_field_string"
+            android:textColor="#FF0000"
+            android:visibility="gone"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/signUpLastNameLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="30dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/last_name_text"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:labelFor="@+id/signUpLastNameEditText"
+            />
+
+        <EditText
+            android:id="@+id/signUpLastNameEditText"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_text_background"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:ems="10"
+            android:inputType="textCapWords"
+            android:autofillHints="name"
+            />
+        <TextView
+            android:id="@+id/signUpLastNameInvalidTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/invalid_field_string"
+            android:textColor="#FF0000"
+            android:visibility="gone"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/signUpEmailLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="30dp"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/email_text"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:labelFor="@+id/signUpEmailEditText"
+            />
+
+        <EditText
+            android:id="@+id/signUpEmailEditText"
+            android:layout_width="match_parent"
+            android:background="@drawable/edit_text_background"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:ems="10"
+            android:inputType="textEmailAddress"
+            android:autofillHints="emailAddress"
+            />
+
+        <TextView
+            android:id="@+id/signUpEmailInvalidTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/invalid_field_string"
+            android:textColor="#FF0000"
+            android:visibility="gone"
+            />
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/signUpFragmentOneButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_marginStart="30dp"
+        android:layout_marginEnd="30dp"
+        android:text="@string/sign_up_continue_text"
+        android:textSize="20sp"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:backgroundTint="@color/pink"
+        android:background="@drawable/main_button_pink"
+        />
+
+</LinearLayout>
