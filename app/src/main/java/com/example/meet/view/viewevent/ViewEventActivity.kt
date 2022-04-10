@@ -3,6 +3,7 @@ package com.example.meet.view.viewevent
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
@@ -200,6 +201,17 @@ class ViewEventActivity : AppCompatActivity(), ViewEventMainFragment.OnEventList
         if(supportFragmentManager.backStackEntryCount == 0){
             finish()
         }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        //Set up the back button for the support action bar
+        when(item.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun returnToMainFragmentFromAttendingList() {

@@ -60,11 +60,10 @@ class CalendarFragment : Fragment(), CalendarListAdapter.OnEventListener {
         calendarRecyclerView.layoutManager = linearLayoutManager
         calendarRecyclerView.adapter = calendarListAdapter
 
-        calendarViewModel.getEventsMutableLiveData().observe(viewLifecycleOwner,
-            {
-                calendarListAdapter.setData(it)
-                println("Data changed!")
-            })
+        calendarViewModel.getEventsMutableLiveData().observe(viewLifecycleOwner
+        ) {
+            calendarListAdapter.setData(it)
+        }
     }
 
     fun updateCalendar(){

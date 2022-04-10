@@ -40,6 +40,7 @@ class MessagesAdapter(private var messagesList: MutableList<Message>, private va
         }else {
             params.topMargin = 20
             holder.messageLayout.layoutParams = params
+            holder.messageLayout.setBackgroundResource(R.drawable.message_item_background)
         }
     }
 

@@ -55,6 +55,10 @@ class FeedViewModel(application: Application): AndroidViewModel(application) {
                         val messages = if(it.result!!.child("messages").value == null) HashMap()
                         else it.result!!.child("messages").value as HashMap<String, HashMap<String, String>>
 
+                        //check if invited list exists for event
+                        val invitedList = if(it.result!!.child("invitedList").value == null) mutableListOf()
+                        else it.result.child("invitedList").value as MutableList<String>
+
                         invitations.add(Event(it.result!!.child("name").value.toString(),
                             it.result!!.child("date").value.toString(),
                             it.result!!.child("time").value.toString(),
@@ -63,7 +67,7 @@ class FeedViewModel(application: Application): AndroidViewModel(application) {
                             it.result!!.child("eventId").value.toString(),
                             it.result!!.child("organiserId").value.toString(),
                             it.result!!.child("description").value.toString(),
-                            it.result!!.child("invitedList").value as MutableList<String>,
+                            invitedList,
                             it.result!!.child("attendingList").value as MutableList<String>,
                             messages
                         ))

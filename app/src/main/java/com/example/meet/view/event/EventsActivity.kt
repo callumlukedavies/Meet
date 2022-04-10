@@ -105,9 +105,6 @@ class EventsActivity : AppCompatActivity(), EventOneFragment.OnEventListener,
 
     override fun eventsThreeFragmentCompleted(invitedList: MutableList<String>) {
         eventsViewModel.setInvitedList(invitedList)
-        for(string: String in invitedList){
-            println(string)
-        }
         changeFragment(supportFragmentManager.backStackEntryCount)
     }
 

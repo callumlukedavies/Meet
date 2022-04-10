@@ -62,11 +62,11 @@ class FeedFragment : Fragment(), InvitationListAdapter.OnEventListener {
 
         feedInvitationRecyclerView.layoutManager = linearLayoutManager
         feedInvitationRecyclerView.adapter = invitationListAdapter
-        feedViewModel.getInvitationsMutableLiveData().observe(viewLifecycleOwner,
-        {
+        feedViewModel.getInvitationsMutableLiveData().observe(viewLifecycleOwner
+        ) {
             invitationListAdapter.setData(it)
             println("Data changed!")
-        })
+        }
 
         feedCreateEventButton.setOnClickListener {
             val intent = Intent(activity, EventsActivity::class.java)

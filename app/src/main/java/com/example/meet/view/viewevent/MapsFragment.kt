@@ -1,4 +1,4 @@
-package com.example.meet.view.event
+package com.example.meet.view.viewevent
 
 import android.os.Bundle
 import android.view.LayoutInflater

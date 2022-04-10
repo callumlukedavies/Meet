@@ -2,6 +2,7 @@ package com.example.meet.view.home
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
@@ -10,7 +11,6 @@ import com.example.meet.view.calendar.CalendarFragment
 import com.example.meet.view.feed.FeedFragment
 import com.example.meet.view.friends.FriendsFragment
 import com.example.meet.view.profile.ProfileFragment
-import java.util.*
 
 class HomeActivity : AppCompatActivity() {
 
@@ -22,13 +22,12 @@ class HomeActivity : AppCompatActivity() {
     private val FEED_FRAGMENT_TAG = "feedFragment"
     private var calendarFragment: CalendarFragment? = null
     private val CALENDAR_FRAGMENT_TAG = "calendarFragment"
+    private lateinit var CURRENT_TAG: String
 
-    private lateinit var CURRENT_FRAGMENT_TAG: String
     private lateinit var profileButton: Button
     private lateinit var friendsButton: Button
     private lateinit var feedButton: Button
     private lateinit var calendarButton: Button
-    private lateinit var stack: Stack<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,18 +41,13 @@ class HomeActivity : AppCompatActivity() {
         feedButton = findViewById(R.id.feedFragmentButton)
         profileButton = findViewById(R.id.profileFragmentButton)
         calendarButton = findViewById(R.id.calendarFragmentButton)
-        stack = Stack()
 
         if(savedInstanceState != null){
             if(supportFragmentManager.findFragmentByTag(FRIENDS_FRAGMENT_TAG) != null) {
                 friendsFragment = supportFragmentManager
                         .findFragmentByTag(FRIENDS_FRAGMENT_TAG) as FriendsFragment
-                CURRENT_FRAGMENT_TAG = FRIENDS_FRAGMENT_TAG
-                stack.push(FRIENDS_FRAGMENT_TAG)
             }else {
                 friendsFragment = FriendsFragment()
-                CURRENT_FRAGMENT_TAG = FRIENDS_FRAGMENT_TAG
-                stack.push(FRIENDS_FRAGMENT_TAG)
             }
 
         } else {
@@ -61,107 +55,117 @@ class HomeActivity : AppCompatActivity() {
 
             val fragmentTransaction = supportFragmentManager.beginTransaction()
             fragmentTransaction.add(R.id.homeActivityFragmentContainer, friendsFragment!!, FRIENDS_FRAGMENT_TAG)
+            fragmentTransaction.setReorderingAllowed(true)
             fragmentTransaction.addToBackStack(FRIENDS_FRAGMENT_TAG)
             fragmentTransaction.commit()
-            CURRENT_FRAGMENT_TAG = FRIENDS_FRAGMENT_TAG
-            stack.push(FRIENDS_FRAGMENT_TAG)
+            CURRENT_TAG = FRIENDS_FRAGMENT_TAG
         }
 
         profileButton.setOnClickListener {
-            if(profileFragment == null){
-                profileFragment = ProfileFragment()
-                val fragmentTransaction = supportFragmentManager.beginTransaction()
-                hideFragment(fragmentTransaction)
-                fragmentTransaction.add(R.id.homeActivityFragmentContainer, profileFragment!!, PROFILE_FRAGMENT_TAG)
-                fragmentTransaction.addToBackStack(PROFILE_FRAGMENT_TAG)
-                fragmentTransaction.commit()
-                CURRENT_FRAGMENT_TAG = PROFILE_FRAGMENT_TAG
-                stack.push(PROFILE_FRAGMENT_TAG)
-            } else {
-                val fragmentTransaction = supportFragmentManager.beginTransaction()
-                hideFragment(fragmentTransaction)
-                fragmentTransaction.show(profileFragment!!)
-                fragmentTransaction.commit()
-                CURRENT_FRAGMENT_TAG = PROFILE_FRAGMENT_TAG
-                stack.push(PROFILE_FRAGMENT_TAG)
-            }
+            Log.d("HomeActivity", "profileButton Clicked")
             updateButtonColours(profileButton)
             actionBar?.title = "Profile"
+
+            val fragmentTransaction = supportFragmentManager.beginTransaction()
+            fragmentTransaction.setReorderingAllowed(true)
+            hideFragment(fragmentTransaction)
+
+            if(profileFragment == null) {
+                profileFragment = ProfileFragment()
+                fragmentTransaction.add(R.id.homeActivityFragmentContainer, profileFragment!!, PROFILE_FRAGMENT_TAG)
+                fragmentTransaction.addToBackStack(PROFILE_FRAGMENT_TAG)
+            } else {
+//                fragmentTransaction.show(profileFragment!!)
+                supportFragmentManager.popBackStack(PROFILE_FRAGMENT_TAG, 0)
+            }
+
+            fragmentTransaction.commit()
         }
 
         friendsButton.setOnClickListener {
-            val fragmentTransaction = supportFragmentManager.beginTransaction()
-            hideFragment(fragmentTransaction)
-            fragmentTransaction.show(friendsFragment!!)
-            fragmentTransaction.commit()
-            CURRENT_FRAGMENT_TAG = FRIENDS_FRAGMENT_TAG
-            stack.push(FRIENDS_FRAGMENT_TAG)
+            Log.d("HomeActivity", "friendsButton Clicked")
             updateButtonColours(friendsButton)
             actionBar?.title = "Friends"
+
+            val fragmentTransaction = supportFragmentManager.beginTransaction()
+            fragmentTransaction.setReorderingAllowed(true)
+            hideFragment(fragmentTransaction)
+//            fragmentTransaction.show(friendsFragment!!)
+            supportFragmentManager.popBackStack(FRIENDS_FRAGMENT_TAG, 0)
+
+            fragmentTransaction.commit()
+
         }
 
         feedButton.setOnClickListener {
-            val fragmentTransaction = supportFragmentManager.beginTransaction()
-            if(feedFragment == null){
-                feedFragment = FeedFragment()
-                hideFragment(fragmentTransaction)
-                fragmentTransaction.add(R.id.homeActivityFragmentContainer, feedFragment!!, FEED_FRAGMENT_TAG)
-                fragmentTransaction.addToBackStack(FEED_FRAGMENT_TAG)
-                fragmentTransaction.commit()
-            } else {
-                hideFragment(fragmentTransaction)
-                fragmentTransaction.show(feedFragment!!)
-                fragmentTransaction.commit()
-            }
-
-            CURRENT_FRAGMENT_TAG = FEED_FRAGMENT_TAG
-            stack.push(FEED_FRAGMENT_TAG)
+            Log.d("HomeActivity", "feedButton Clicked")
             updateButtonColours(feedButton)
             actionBar?.title = "Feed"
+
+            val fragmentTransaction = supportFragmentManager.beginTransaction()
+            fragmentTransaction.setReorderingAllowed(true)
+            hideFragment(fragmentTransaction)
+
+            if(feedFragment == null){
+                feedFragment = FeedFragment()
+                fragmentTransaction.add(R.id.homeActivityFragmentContainer, feedFragment!!, FEED_FRAGMENT_TAG)
+                fragmentTransaction.addToBackStack(FEED_FRAGMENT_TAG)
+            } else {
+//                fragmentTransaction.show(feedFragment!!)
+                supportFragmentManager.popBackStack(FEED_FRAGMENT_TAG, 0)
+
+            }
+
+            fragmentTransaction.commit()
         }
 
         calendarButton.setOnClickListener {
+            Log.d("HomeActivity", "calendarButton Clicked")
+            updateButtonColours(calendarButton)
+            actionBar?.title = "Calendar"
+
             val fragmentTransaction = supportFragmentManager.beginTransaction()
+            fragmentTransaction.setReorderingAllowed(true)
+            hideFragment(fragmentTransaction)
+
             if(calendarFragment == null){
                 calendarFragment = CalendarFragment()
-                hideFragment(fragmentTransaction)
                 fragmentTransaction.add(R.id.homeActivityFragmentContainer, calendarFragment!!, CALENDAR_FRAGMENT_TAG)
                 fragmentTransaction.addToBackStack(CALENDAR_FRAGMENT_TAG)
-                fragmentTransaction.commit()
             } else {
-                hideFragment(fragmentTransaction)
-                fragmentTransaction.show(calendarFragment!!)
-                fragmentTransaction.commit()
+//                fragmentTransaction.show(calendarFragment!!)
             }
 
-
-            CURRENT_FRAGMENT_TAG = CALENDAR_FRAGMENT_TAG
-            stack.push(CALENDAR_FRAGMENT_TAG)
-            updateButtonColours(calendarButton)
             calendarFragment!!.updateCalendar()
-            actionBar?.title = "Calendar"
+            fragmentTransaction.commit()
         }
     }
 
     private fun hideFragment(ft: FragmentTransaction){
-        when (stack.peek()) {
+        Log.d("HomeActivity", "hideFragment")
+        val count = supportFragmentManager.backStackEntryCount - 1
+        when (supportFragmentManager.getBackStackEntryAt(count).name) {
             FRIENDS_FRAGMENT_TAG -> {
+                Log.d("HomeActivity", "Hide Friends Fragment")
                 ft.hide(friendsFragment!!)
             }
             PROFILE_FRAGMENT_TAG -> {
+                Log.d("HomeActivity", "Hide Profile Fragment")
                 ft.hide(profileFragment!!)
             }
             FEED_FRAGMENT_TAG -> {
+                Log.d("HomeActivity", "Hide Feed Fragment")
                 ft.hide(feedFragment!!)
             }
             CALENDAR_FRAGMENT_TAG -> {
+                Log.d("HomeActivity", "Hide Calendar Fragment")
                 ft.hide(calendarFragment!!)
             }
         }
     }
 
-    private fun reverseButtonColours(){
-        when (stack.peek()) {
+    private fun reverseButtonColours(name: String){
+        when (name) {
             FRIENDS_FRAGMENT_TAG -> {
                 updateButtonColours(friendsButton)
             }
@@ -185,14 +189,48 @@ class HomeActivity : AppCompatActivity() {
         button.setBackgroundColor(Color.parseColor("#CCCCCC"))
     }
 
-    override fun onBackPressed() {
-        super.onBackPressed()
-        println("OnBackPressed")
-        println(supportFragmentManager.backStackEntryCount)
-        stack.pop()
-        reverseButtonColours()
-        if(supportFragmentManager.backStackEntryCount == 0){
-            finish()
+    private fun updateActionBarTitle(name: String){
+        when (name) {
+            FRIENDS_FRAGMENT_TAG -> {
+                supportActionBar?.title = "Friends"
+            }
+
+            PROFILE_FRAGMENT_TAG -> {
+                supportActionBar?.title = "Profile"
+            }
+
+            FEED_FRAGMENT_TAG -> {
+                supportActionBar?.title = "Feed"
+            }
+
+            CALENDAR_FRAGMENT_TAG -> {
+                supportActionBar?.title = "Calendar"
+            }
         }
+    }
+
+    override fun onBackPressed() {
+        Log.d("HomeActivity", "OnBackPressed")
+        Log.d("HomeActivity", "entry count is ${supportFragmentManager.backStackEntryCount}")
+        if(CURRENT_TAG == supportFragmentManager
+                .getBackStackEntryAt(supportFragmentManager.backStackEntryCount-1).name){
+            //If current tag is the highest thing on the stack, then pop the stack as normal
+            super.onBackPressed()
+            val count = supportFragmentManager.backStackEntryCount - 1
+            val fragmentName = supportFragmentManager.getBackStackEntryAt(count).name
+            updateActionBarTitle(fragmentName!!)
+            reverseButtonColours(fragmentName)
+            if(supportFragmentManager.backStackEntryCount == 0){
+                finish()
+            }
+
+        }else {
+            //hide the current thing and show the thing on the backstack
+            val count = supportFragmentManager.backStackEntryCount - 1
+            val fragmentName = supportFragmentManager.getBackStackEntryAt(count).name
+
+        }
+
+
     }
 }

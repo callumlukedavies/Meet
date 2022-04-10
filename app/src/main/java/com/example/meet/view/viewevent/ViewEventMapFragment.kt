@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.example.meet.R
-import com.example.meet.view.event.MapsFragment
 import com.example.meet.viewmodel.ViewEventViewModel
 
 

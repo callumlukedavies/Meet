@@ -75,7 +75,6 @@ class LoginActivity : AppCompatActivity() {
         if(TextUtils.isEmpty(loginViewModel.getPassword())){
             Toast.makeText(applicationContext, "Please enter a password to login", Toast.LENGTH_SHORT).show()
             isValidLogin = false
-
         }
 
         if(TextUtils.isDigitsOnly(loginViewModel.getEmail())){

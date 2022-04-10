@@ -54,6 +54,11 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
                     //check if messages exist for this event
                     val messages = if(it.result!!.child("messages").value == null) HashMap()
                     else it.result!!.child("messages").value as HashMap<String, HashMap<String, String>>
+
+                    //check if invited list exists for event
+                    val invitedList = if(it.result!!.child("invitedList").value == null) mutableListOf<String>()
+                    else it.result.child("invitedList").value as MutableList<String>
+
                     //add event to the list
                     events.add(
                         Event(it.result!!.child("name").value.toString(),
@@ -64,7 +69,7 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
                             it.result!!.child("eventId").value.toString(),
                             it.result!!.child("organiserId").value.toString(),
                             it.result!!.child("description").value.toString(),
-                            it.result!!.child("invitedList").value as MutableList<String>,
+                            invitedList,
                             it.result!!.child("attendingList").value as MutableList<String>,
                             messages
                         )

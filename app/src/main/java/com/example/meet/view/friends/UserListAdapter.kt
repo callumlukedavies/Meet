@@ -42,10 +42,6 @@ class UserListAdapter(private var friendsViewModel : FriendsViewModel, private v
             friendsViewModel.updateFriendsAdapter(users[position])
             friendsViewModel.sendFriendRequest(id)
         }
-
-
-
-
     }
 
     override fun getItemCount(): Int {

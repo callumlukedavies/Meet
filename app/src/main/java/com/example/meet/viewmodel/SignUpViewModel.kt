@@ -119,8 +119,8 @@ class SignUpViewModel(application: Application) : AndroidViewModel(application) 
                     }
                 }
             }
-            else{
-                Toast.makeText(getApplication(), "Unable to Log In", Toast.LENGTH_SHORT).show()
+            else {
+                Toast.makeText(getApplication(), "Unable to sign up", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -38,7 +38,7 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
     fun searchFriendsList(name : String): MutableList<User> {
         val possibleResultsList = mutableListOf<User>()
         for(friend: User in userFriendsList){
-            if((friend.firstName + " " + friend.lastName).contains(name)){
+            if((friend.firstName + " " + friend.lastName).lowercase().contains(name.lowercase())){
                 possibleResultsList.add(friend)
             }
         }
@@ -49,7 +49,7 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
     fun searchUserList(name : String): MutableList<User> {
         val possibleResultsList = mutableListOf<User>()
         for(user: User in listOfUsers){
-            if((user.firstName + " " + user.lastName).contains(name)){
+            if((user.firstName + " " + user.lastName).lowercase().contains(name.lowercase())){
                 possibleResultsList.add(user)
             }
         }
@@ -105,7 +105,6 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
                                     listOfUsers.add(user)
                                 }
 
-                                println("Size is ${listOfUsers.size}")
                                 friendsListMutableLiveData.postValue(listOfUsers)
                             }
                         }
@@ -138,9 +137,6 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
     fun sendFriendRequest(userId : String){
         //Updates the friends list of the user who's Id matches userId, with the current
         //users ID
-//        for(friend: User in userFriendsList){
-//            if(friend.id == userId) return
-//        }
 
         mainRepository.getFriendsOfUser(userId).addOnCompleteListener {
             if(it.isSuccessful){
