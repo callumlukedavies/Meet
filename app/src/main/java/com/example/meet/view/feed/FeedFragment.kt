@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -56,6 +57,7 @@ class FeedFragment : Fragment(), InvitationListAdapter.OnEventListener {
         val feedViewModelFactory = FeedViewModelFactory(requireActivity().application)
         feedViewModel = ViewModelProvider(this, feedViewModelFactory).get(FeedViewModel::class.java)
         invitationListAdapter = InvitationListAdapter(mutableListOf(), this.requireContext(), this)
+        val noInvitationsTextView = view.findViewById<TextView>(R.id.noInvitationsTextView)
         val feedCreateEventButton = view.findViewById<Button>(R.id.feedCreateEventButton)
         val feedInvitationRecyclerView = view.findViewById<RecyclerView>(R.id.feedInvitationRecyclerView)
         val linearLayoutManager = LinearLayoutManager(context)
@@ -65,7 +67,9 @@ class FeedFragment : Fragment(), InvitationListAdapter.OnEventListener {
         feedViewModel.getInvitationsMutableLiveData().observe(viewLifecycleOwner
         ) {
             invitationListAdapter.setData(it)
-            println("Data changed!")
+            if(it.size > 0){
+                noInvitationsTextView.visibility = View.GONE
+            }
         }
 
         feedCreateEventButton.setOnClickListener {
@@ -78,5 +82,14 @@ class FeedFragment : Fragment(), InvitationListAdapter.OnEventListener {
         val intent = Intent(activity, ViewEventActivity::class.java)
         intent.putExtra("eventId", eventId)
         resultLauncher.launch(intent)
+    }
+
+    fun updateFeed(){
+        if(this::feedViewModel.isInitialized) feedViewModel.getInvitations()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateFeed()
     }
 }

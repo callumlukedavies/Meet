@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.meet.model.MainRepository
 import com.example.meet.model.User
 import com.google.android.gms.tasks.Tasks
@@ -18,24 +19,37 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
     private var mainRepository : MainRepository
 
     private var friendsListMutableLiveData : MutableLiveData<MutableList<User>>
+    private var requestedListMutableLiveData : MutableLiveData<MutableList<User>>
     private var usersListAdapterMutableLiveData : MutableLiveData<MutableList<User>>
 
     //List of the users friends Id's
     private var userFriendsList : MutableList<User>
+    //List of the users friend request's Id's
+    private var userRequestedList : MutableList<User>
     //List of all users on the platform
     private var listOfUsers : MutableList<User>
+    //list of users sent friend request's Id's
+    private var sentFriendRequestsList : MutableList<User>
 
     init {
         firebaseAuth = FirebaseAuth.getInstance()
         mainRepository = MainRepository()
         friendsListMutableLiveData = MutableLiveData()
+        requestedListMutableLiveData = MutableLiveData()
         usersListAdapterMutableLiveData = MutableLiveData()
         userFriendsList = mutableListOf()
+        userRequestedList = mutableListOf()
         listOfUsers = mutableListOf()
-        getFriendsList()
+        sentFriendRequestsList = mutableListOf()
+
+        friendsListMutableLiveData.postValue(userFriendsList)
+        requestedListMutableLiveData.postValue(userRequestedList)
+        getUserData()
     }
 
     fun searchFriendsList(name : String): MutableList<User> {
+        //Searches the userFriendsList variable for a friend with a name
+        //matching the input and returns the list of results that match
         val possibleResultsList = mutableListOf<User>()
         for(friend: User in userFriendsList){
             if((friend.firstName + " " + friend.lastName).lowercase().contains(name.lowercase())){
@@ -47,6 +61,8 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun searchUserList(name : String): MutableList<User> {
+        //Searches the userFriendsList variable for a user with a name
+        //matching the input and returns the list of results that match
         val possibleResultsList = mutableListOf<User>()
         for(user: User in listOfUsers){
             if((user.firstName + " " + user.lastName).lowercase().contains(name.lowercase())){
@@ -57,10 +73,98 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
         return possibleResultsList
     }
 
-    fun getFriendsList () {
+    private fun getUserData() = viewModelScope.launch {
+        //Gets the requestedFriends, friends, and friendRequests lists from the database
+        //and passes them to various functions for processing
+        var friendIdList: HashMap<String, String>
+        var requestedIdList: HashMap<String, String>
+        var sentRequestIdList: HashMap<String, String>
+
+        mainRepository.getMyUserData().addOnCompleteListener {
+            if(it.isSuccessful){
+                Log.d("firebase comms: ", "Retrieved friends from database")
+
+                if(it.result!!.child("requestedFriends").getValue() != null){
+                    sentRequestIdList = it.result!!.child("requestedFriends").getValue() as HashMap<String, String>
+                    processSentFriendRequestIds(sentRequestIdList)
+                }
+
+                if(it.result!!.child("friends").getValue() != null){
+                    friendIdList = it.result!!.child("friends").getValue() as HashMap<String, String>
+                    processFriendIds(friendIdList)
+                }
+
+                if(it.result!!.child("friendRequests").getValue() != null){
+                    requestedIdList = it.result!!.child("friendRequests").getValue() as HashMap<String, String>
+                    processFriendRequestIds(requestedIdList)
+                }
+            }else {
+                Log.d("firebase comms: ", "Unable to get friends ID list.")
+            }
+        }
+    }
+
+    private fun processFriendIds(friendIdList : HashMap<String, String>){
+        //takes a list of friend id's and uses them to create a list of User objects
+        for((key, value) in friendIdList){
+            mainRepository.getUserData(value).addOnCompleteListener{
+                if(it.isSuccessful){
+                    val firstName = it.result!!.child("firstName").getValue().toString()
+                    val lastName = it.result!!.child("lastName").getValue().toString()
+
+                    userFriendsList.add(User(firstName, lastName, value, null))
+                    friendsListMutableLiveData.postValue(userFriendsList)
+
+                    for(sentRequest : User in sentFriendRequestsList){
+                        if(sentRequest.id == value){
+                            mainRepository.removeUserFromRequestedList(sentRequest.key!!)
+                        }
+                    }
+                } else {
+                    Log.d("firebase comms: ", "Unable to receive user data.")
+                }
+            }
+        }
+    }
+
+    private fun processFriendRequestIds(requestedIdList : HashMap<String, String>){
+        //takes a list of friend request id's and uses them to create a list of User objects
+        for((key, value) in requestedIdList){
+            mainRepository.getUserData(value).addOnCompleteListener{
+                if(it.isSuccessful){
+                    val firstName = it.result!!.child("firstName").getValue().toString()
+                    val lastName = it.result!!.child("lastName").getValue().toString()
+
+                    userRequestedList.add(User(firstName, lastName, value, key))
+                    requestedListMutableLiveData.postValue(userRequestedList)
+                } else {
+                    Log.d("firebase comms: ", "Unable to receive user data.")
+                }
+            }
+        }
+    }
+
+    private fun processSentFriendRequestIds(requestedIdList : HashMap<String, String>){
+        //takes a list of requested friend id's and uses them to create a list of User objects
+        for((key, value) in requestedIdList){
+            mainRepository.getUserData(value).addOnCompleteListener{
+                if(it.isSuccessful){
+                    val firstName = it.result!!.child("firstName").getValue().toString()
+                    val lastName = it.result!!.child("lastName").getValue().toString()
+
+                    sentFriendRequestsList.add(User(firstName, lastName, value, key))
+
+                } else {
+                    Log.d("firebase comms: ", "Unable to receive user data.")
+                }
+            }
+        }
+    }
+
+    fun getFriendsList() {
         //Get a list of the users friends from the database and store it
         //in a MutableLiveData object
-        var friendIdList : MutableList<String>
+        var friendIdList : HashMap<String, String>
         if(userFriendsList.isEmpty()) {
             runBlocking {
                 launch(Dispatchers.Default){
@@ -68,8 +172,8 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
                         if(it.isSuccessful){
                             Log.d("firebase comms: ", "Retrieved friends from database")
                             if(it.result!!.child("friends").getValue() != null){
-                                friendIdList = it.result!!.child("friends").getValue() as MutableList<String>
-                                processIds(friendIdList)
+                                friendIdList = it.result!!.child("friends").getValue() as HashMap<String, String>
+                                processFriendIds(friendIdList)
                             }
                         }else {
                             Log.d("firebase comms: ", "Unable to get friends ID list.")
@@ -93,15 +197,27 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
                         Log.d("firebase comms", "Successfully received all users from database")
 
                         for (child: DataSnapshot in it.result!!.children) {
-
+                            // For each row in the Users table
                             if(firebaseAuth.uid != child.child("userId").value.toString()){
+                                // If the userId of the user doesn't match the currently signed
+                                // in users Id, create a User object
+                                var ignored = false
                                 val user = User(
                                     child.child("firstName").value.toString(),
                                     child.child("lastName").value.toString(),
-                                    child.child("userId").value.toString()
+                                    child.child("userId").value.toString(),
+                                    null
                                 )
 
-                                if(!userFriendsList.contains(user)){
+                                for(sentRequest: User in sentFriendRequestsList){
+                                    //Check if the user is in the sentFriendRequest list,
+                                    //as we don't want to show those users in the list
+                                    if(sentRequest.id == user.id) ignored = true
+                                }
+
+                                if(!userFriendsList.contains(user) && !ignored){
+                                    // If the user object isn't in the users list of friends,
+                                    // add the the user to the listOfUsers variable
                                     listOfUsers.add(user)
                                 }
 
@@ -118,104 +234,95 @@ class FriendsViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    fun processIds(friendIdList : MutableList<String>){
-        for(id : String in friendIdList){
-            mainRepository.getUserData(id).addOnCompleteListener{
-                if(it.isSuccessful){
-                    val firstName = it.result!!.child("firstName").getValue().toString()
-                    val lastName = it.result!!.child("lastName").getValue().toString()
-
-                    userFriendsList.add(User(firstName, lastName, id))
-                    friendsListMutableLiveData.postValue(userFriendsList)
-                } else {
-                    Log.d("firebase comms: ", "Unable to receive user data.")
-                }
-            }
-        }
-    }
-
-    fun sendFriendRequest(userId : String){
+    fun sendFriendRequest(userId : String) {
         //Updates the friends list of the user who's Id matches userId, with the current
         //users ID
-
-        mainRepository.getFriendsOfUser(userId).addOnCompleteListener {
-            if(it.isSuccessful){
-                Log.d("firebase comms", "Successfully received friends of user.")
-                var userFriends = mutableListOf<String>()
-                if(it.result!!.getValue() != null){
-                    userFriends = it.result!!.getValue() as MutableList<String>
-                    userFriends.add(firebaseAuth.uid!!)
-                } else {
-                    userFriends.add(firebaseAuth.uid!!)
-                }
-                mainRepository.sendFriendRequest(userId, userFriends).addOnCompleteListener {
-                    if(it.isSuccessful){
-                        Log.d("firebase comms", "Successfully sent friend request to $userId.")
-                        updateFriendsList(userId)
+        mainRepository.sendFriendRequest(userId).addOnCompleteListener {
+            if (it.isSuccessful) {
+                Log.d("MainRepository", "Successfully sent friend request")
+                mainRepository.updateRequestedList(userId).addOnCompleteListener { request ->
+                    if (request.isSuccessful) {
+                        Log.d("MainRepository", "Successfully updated users requested list")
+                    } else {
+                        Log.d("MainRepository", "Error: could not update users requested list")
                     }
                 }
             } else {
-                Log.d("firebase comms", "Could not get friends of user.")
+                Log.d("MainRepository", "Error: could not send friend request")
             }
         }
     }
 
-    fun updateFriendsList(userId: String){
-        //Updates the friends list of the user with the UserID passed as a variable
-        mainRepository.getMyUserData().addOnCompleteListener {
+    fun acceptFriendRequest(userId: String, key: String) {
+        //Handles necessary calls to the database to accept a friend request from another user
+        mainRepository.addFriendToFriendsList(userId).addOnCompleteListener {
             if(it.isSuccessful){
-                Log.d("firebase comms", "Successfully received user data.")
-                var friendIdList = mutableListOf<String>()
-                if(it.result!!.child("friends").getValue() != null){
-                    friendIdList = it.result!!.child("friends").getValue() as MutableList<String>
-                    friendIdList.add(userId)
-                } else {
-                    friendIdList.add(userId)
-
-                }
-                mainRepository.updateFriendsList(friendIdList).addOnCompleteListener {
-                    if(it.isSuccessful){
-                        Log.d("firebase comms", "Successfully updated friends list for user.")
-                    }
-                    else {
-                        Log.d("firebase comms", "Could not update friends list for user.")
-                    }
-                }
-            }else {
-                Log.d("firebase comms: ", "Unable to get friends ID list.")
+                Log.d("firebase comms: ", "Successfully added new friend to friends list.")
+            } else {
+                Log.d("firebase comms: ", "Unable to add new friend to friends list.")
             }
         }
+
+        mainRepository.removeFriendRequest(userId, key).addOnCompleteListener {
+            if(it.isSuccessful){
+                Log.d("firebase comms: ", "Successfully removed friend request.")
+            } else {
+                Log.d("firebase comms: ", "Unable to add remove friend request.")
+            }
+        }
+
+        mainRepository.sendIdToNewFriend(userId).addOnCompleteListener {
+            if(it.isSuccessful){
+                Log.d("firebase comms: ", "Successfully sent user Id to new friend.")
+            } else {
+                Log.d("firebase comms: ", "Unable to send user Id to new friend.")
+            }
+        }
+    }
+
+    fun rejectFriendRequest(userId: String, key: String){
+        //Removes the friend request from the users database entry
+        mainRepository.removeFriendRequest(userId, key).addOnCompleteListener {
+            if(it.isSuccessful){
+                Log.d("firebase comms: ", "Successfully removed friend request.")
+
+            } else {
+                Log.d("firebase comms: ", "Unable to remove friend request.")
+            }
+        }
+    }
+
+    fun updateRequestedListAdapter(user: User, requestStatus: Int) : MutableList<User> {
+        //If request status is 1, the user has accepted the friend request, so add
+        //the friend to the friends list. Then remove the user from the requested list
+        //and return the list
+        if(requestStatus == 1){
+            userFriendsList.add(user)
+        }
+        userRequestedList.remove(user)
+        return userRequestedList
+    }
+
+    fun updateFriendsAdapter(user : User): MutableList<User> {
+        //Removes a user from the list of users, this is called when the
+        //user sends a friend request
+        listOfUsers.remove(user)
+        return listOfUsers
     }
 
     fun getFriendsListMutableLiveData() : MutableLiveData<MutableList<User>> {
         return friendsListMutableLiveData
     }
 
-    fun getUserListAdapterMutableLiveData() : MutableLiveData<MutableList<User>> {
-        return this.usersListAdapterMutableLiveData
-    }
-
-    fun isUserListPopulated() : Boolean {
-        return listOfUsers.isNotEmpty()
-    }
-
-    fun isFriendsListPopulated() : Boolean {
-        return userFriendsList.isNotEmpty()
+    fun getRequestedListMutableLiveData() : MutableLiveData<MutableList<User>> {
+        return requestedListMutableLiveData
     }
 
     fun getUserFriendsList(): MutableList<User> {
         return userFriendsList
     }
 
-    fun updateFriendsAdapter(user : User): MutableList<User> {
-        userFriendsList.add(user)
-        listOfUsers.remove(user)
-        return listOfUsers
+    fun getUserRequestedList() :MutableList<User> {
+        return userRequestedList
     }
-
-//    fun getUserAdapter(): UserListAdapter {
-//        getAllUsers()
-//        usersListAdapter = UserListAdapter(this, listOfUsers)
-//        return usersListAdapter
-//    }
 }

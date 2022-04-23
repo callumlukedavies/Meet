@@ -12,35 +12,36 @@ import java.util.*
 
 class CalendarViewModel(application: Application) : AndroidViewModel(application) {
 
-    private var mainRepository : MainRepository
-    private var firebaseAuth : FirebaseAuth
+    private var mainRepository : MainRepository = MainRepository()
+    private var firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private var events: MutableList<Event>
     private var eventsMutableLiveData: MutableLiveData<MutableList<Event>>
 
     init {
-        mainRepository = MainRepository()
-        firebaseAuth = FirebaseAuth.getInstance()
         events = mutableListOf()
         eventsMutableLiveData = MutableLiveData()
         getEvents()
     }
 
     fun getEvents(){
+        //Makes a call to the main repository to get a list of event Id's
+        //that correspond to the events the user is signed up for
         mainRepository.getUsersEvents().addOnCompleteListener {
             if(it.isSuccessful && it.result!!.value != null){
                 events = mutableListOf()
-                val eventIds = it.result!!.value as MutableList<String>
+                val eventIds = it.result!!.value as HashMap<String, String>
                 getEventDetails(eventIds)
             }
         }
     }
 
-    private fun getEventDetails(eventIds: MutableList<String>){
+    private fun getEventDetails(eventIds: HashMap<String, String>){
+        //Processes the list of eventIds and turns them into Event objects
         val calendar = Calendar.getInstance(Locale.ENGLISH)
         val dateFormat = SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.ENGLISH)
 
-        for(eventId: String in eventIds){
-            if(eventId != null) mainRepository.getEventDetails(eventId).addOnCompleteListener {
+        for((key, value) in eventIds){
+            mainRepository.getEventDetails(value).addOnCompleteListener {
                 if(it.isSuccessful && it.result!!.value != null){
                     Log.d("Firebase Comms", "Successfully received event data")
                     val date = it.result!!.child("date").value.toString()
@@ -51,12 +52,13 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
                     if(calendar.time.after(dateFormat.parse(eventDate))){
                         return@addOnCompleteListener
                     }
+
                     //check if messages exist for this event
                     val messages = if(it.result!!.child("messages").value == null) HashMap()
                     else it.result!!.child("messages").value as HashMap<String, HashMap<String, String>>
 
                     //check if invited list exists for event
-                    val invitedList = if(it.result!!.child("invitedList").value == null) mutableListOf<String>()
+                    val invitedList = if(it.result!!.child("invitedList").value == null) mutableListOf()
                     else it.result.child("invitedList").value as MutableList<String>
 
                     //add event to the list
@@ -74,6 +76,7 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
                             messages
                         )
                     )
+                    //Sort the events by date
                     events.sortBy { event ->
                         event.eventDate
                     }
@@ -87,13 +90,13 @@ class CalendarViewModel(application: Application) : AndroidViewModel(application
     }
 
     fun removeEventFromList(eventId: String): MutableList<Event> {
+        //Removes the given Event from the eventList
         for(event: Event in events){
             if(eventId == event.eventId){
                 events.remove(event)
                 break
             }
         }
-
         return events
     }
 

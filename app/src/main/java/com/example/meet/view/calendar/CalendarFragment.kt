@@ -3,9 +3,11 @@ package com.example.meet.view.calendar
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
@@ -56,6 +58,7 @@ class CalendarFragment : Fragment(), CalendarListAdapter.OnEventListener {
         val linearLayoutManager = LinearLayoutManager(context)
         calendarListAdapter = CalendarListAdapter(mutableListOf(), this.requireContext(),this)
         val calendarRecyclerView = view.findViewById<RecyclerView>(R.id.calendarRecyclerView)
+        val noEventsTextView = view.findViewById<TextView>(R.id.noEventsTextView)
 
         calendarRecyclerView.layoutManager = linearLayoutManager
         calendarRecyclerView.adapter = calendarListAdapter
@@ -63,10 +66,11 @@ class CalendarFragment : Fragment(), CalendarListAdapter.OnEventListener {
         calendarViewModel.getEventsMutableLiveData().observe(viewLifecycleOwner
         ) {
             calendarListAdapter.setData(it)
+            if(it.size > 0) noEventsTextView.visibility = View.GONE
         }
     }
 
-    fun updateCalendar(){
+    private fun updateCalendar(){
         if(this::calendarViewModel.isInitialized) calendarViewModel.getEvents()
     }
 
@@ -74,5 +78,16 @@ class CalendarFragment : Fragment(), CalendarListAdapter.OnEventListener {
         val intent = Intent(activity, ViewEventActivity::class.java)
         intent.putExtra("eventId", eventId)
         resultLauncher.launch(intent)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("CalendarFragment", "onResume")
+        updateCalendar()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("CalendarFragment", "onPause")
     }
 }

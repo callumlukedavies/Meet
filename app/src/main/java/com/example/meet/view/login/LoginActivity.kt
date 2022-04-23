@@ -72,13 +72,15 @@ class LoginActivity : AppCompatActivity() {
             isValidLogin = false
         }
 
-        if(TextUtils.isEmpty(loginViewModel.getPassword())){
-            Toast.makeText(applicationContext, "Please enter a password to login", Toast.LENGTH_SHORT).show()
-            isValidLogin = false
-        }
+//        if(loginViewModel.getEmail().contains('{') )
 
         if(TextUtils.isDigitsOnly(loginViewModel.getEmail())){
             Toast.makeText(applicationContext, "Please enter a valid email address to login", Toast.LENGTH_SHORT).show()
+            isValidLogin = false
+        }
+
+        if(TextUtils.isEmpty(loginViewModel.getPassword())){
+            Toast.makeText(applicationContext, "Please enter a password to login", Toast.LENGTH_SHORT).show()
             isValidLogin = false
         }
 

@@ -4,9 +4,11 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.meet.model.Event
 import com.example.meet.model.MainRepository
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,22 +28,24 @@ class FeedViewModel(application: Application): AndroidViewModel(application) {
     }
 
     fun getInvitations() {
+        //Get the list of invitations that the user has received from the main repository
+        invitations = mutableListOf()
         mainRepository.getInvitations(firebaseAuth.uid.toString()).addOnCompleteListener {
             if(it.isSuccessful && it.result!!.value != null){
-                val eventIds = it.result!!.value as MutableList<String>
+                val eventIds = it.result!!.value as HashMap<String, String>
                 getEventDetails(eventIds)
             }
         }
     }
 
-    private fun getEventDetails(eventIds: MutableList<String>){
+    private fun getEventDetails(eventIds: HashMap<String, String>) = viewModelScope.launch {
+        //Processes the list of eventIds and turns them into Event objects
         val calendar = Calendar.getInstance(Locale.ENGLISH)
         val dateFormat = SimpleDateFormat("dd/MM/yyyy hh:mm", Locale.ENGLISH)
 
-
         if(eventIds.size > 0){
-            for(eventId: String in eventIds){
-                mainRepository.getEventDetails(eventId).addOnCompleteListener { it ->
+            for((key, value) in eventIds){
+                mainRepository.getEventDetails(eventIds[key].toString()).addOnCompleteListener { it ->
                     if(it.isSuccessful && it.result!!.value != null){
                         val date = it.result!!.child("date").value.toString()
                         val time = it.result!!.child("time").value.toString()
@@ -51,6 +55,7 @@ class FeedViewModel(application: Application): AndroidViewModel(application) {
                             return@addOnCompleteListener
                         }
 
+                        //Check if the event has any messages
                         Log.d("Firebase Comms", "Successfully received event data")
                         val messages = if(it.result!!.child("messages").value == null) HashMap()
                         else it.result!!.child("messages").value as HashMap<String, HashMap<String, String>>
@@ -85,6 +90,7 @@ class FeedViewModel(application: Application): AndroidViewModel(application) {
     }
 
     fun removeEventFromList(eventId: String): MutableList<Event> {
+        //Removes an invitation from the invitation list
         for(invitation: Event in invitations){
             if(eventId == invitation.eventId){
                 invitations.remove(invitation)

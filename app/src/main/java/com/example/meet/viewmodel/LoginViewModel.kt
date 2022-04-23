@@ -11,7 +11,6 @@ import androidx.lifecycle.MutableLiveData
 import com.example.meet.model.MainRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.messaging.FirebaseMessaging
 
 
 @RequiresApi(Build.VERSION_CODES.P)
@@ -67,12 +66,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     companion object {
-        fun subscribeUserToNotifications(uid: String): Boolean {
-            //Returns a boolean for whether subscribing to
-            // notifications was successful or not.
-            val taskResult = FirebaseMessaging.getInstance().subscribeToTopic(uid)
-            return taskResult.isSuccessful
-        }
 
         fun validateEmailAddress(email: String) : Boolean {
             //Returns whether the email address matches a valid

@@ -35,7 +35,7 @@ class FriendsFragment : Fragment() {
     private lateinit var friendsFragmentFriendsButton: Button
     private lateinit var friendsFragmentPeopleButton: Button
     private lateinit var friendsListAdapter : FriendListAdapter
-    private lateinit var userListAdapter: UserListAdapter
+    private lateinit var requestedListAdapter: RequestedListAdapter
 
     private var isFriendsToggled = true
 
@@ -55,21 +55,26 @@ class FriendsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val linearLayoutManager = LinearLayoutManager(context)
+        val linearLayoutManagerOne = LinearLayoutManager(context)
+        val linearLayoutManagerTwo = LinearLayoutManager(context)
         val friendsFragmentRecyclerView = view.findViewById<RecyclerView>(R.id.friendsFragmentRecyclerView)
+        val requestedRecyclerView = view.findViewById<RecyclerView>(R.id.friendsFragmentRequestedRecyclerView)
         val friendsFragmentSearchButton = view.findViewById<Button>(R.id.friendsFragmentSearchButton)
         friendsFragmentPeopleButton = view.findViewById(R.id.friendsFragmentPeopleButton)
         friendsFragmentFriendsButton = view.findViewById(R.id.friendsFragmentFriendsButton)
         friendsFragmentEditText = view.findViewById(R.id.friendsFragmentEditText)
         friendsFragmentTitleTextView = view.findViewById(R.id.friendsFragmentTitleTextView)
-        friendsFragmentRecyclerView.layoutManager = linearLayoutManager
+        friendsFragmentRecyclerView.layoutManager = linearLayoutManagerOne
+        requestedRecyclerView.layoutManager = linearLayoutManagerTwo
 
         try{
             application = requireActivity().application
             val friendsViewModelFactory = FriendsViewModelFactory(application)
             friendsViewModel = ViewModelProvider(this, friendsViewModelFactory).get(FriendsViewModel::class.java)
             friendsListAdapter = FriendListAdapter(friendsViewModel.getUserFriendsList(), friendsViewModel)
+            requestedListAdapter = RequestedListAdapter(friendsViewModel, friendsViewModel.getUserRequestedList())
             friendsFragmentRecyclerView.adapter = friendsListAdapter
+            requestedRecyclerView.adapter = requestedListAdapter
         } catch (e: IllegalStateException) {
             Log.d("FriendsFragment", "IllegalStateException, can't obtain application")
         }
@@ -95,13 +100,17 @@ class FriendsFragment : Fragment() {
             }
         })
 
+        friendsViewModel.getRequestedListMutableLiveData().observe(viewLifecycleOwner
+        ) {
+            Log.d("FriendsFragment", "updating requestedListAdapter")
+            requestedListAdapter.setData(it, isFriendsToggled)
+        }
+
         friendsFragmentPeopleButton.setOnClickListener {
             if(isFriendsToggled){
                 friendsFragmentEditText.setText("")
                 toggleView()
                 friendsViewModel.getAllUsers()
-//                val titleText = "${friendsListAdapter.itemCount} users"
-//                friendsFragmentTitleTextView.setText(titleText)
             }
         }
 
@@ -110,8 +119,6 @@ class FriendsFragment : Fragment() {
                 friendsFragmentEditText.setText("")
                 toggleView()
                 friendsViewModel.getFriendsList()
-//                val titleText = "${friendsListAdapter.itemCount} friends"
-//                friendsFragmentTitleTextView.setText(titleText)
             }
         }
 

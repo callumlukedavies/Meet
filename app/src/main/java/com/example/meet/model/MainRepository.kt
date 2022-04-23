@@ -14,8 +14,6 @@ class MainRepository() {
     private lateinit var eventChatListener: ChildEventListener
 
     interface EventChatCallback {
-//        fun onNewMessage(list: MutableList<HashMap<String, String>>)
-
         fun onNewMessage(key: String, message: HashMap<String, String>)
 
         fun onError(exception: Exception)
@@ -26,12 +24,12 @@ class MainRepository() {
         database = FirebaseDatabase.getInstance("https://meet-32ba7-default-rtdb.europe-west1.firebasedatabase.app/").reference
     }
 
-    fun addEventChatCallback(eventId: String, callback: EventChatCallback){
+    fun addEventChatCallback(eventId: String, callback: EventChatCallback) {
         eventChatCallback = callback
         val chatListener = object : ChildEventListener {
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                if(snapshot.value != null){
+                if (snapshot.value != null) {
                     val key = snapshot.key as String
                     val message = snapshot.value as java.util.HashMap<String, String>
 
@@ -58,23 +56,8 @@ class MainRepository() {
             }
         }
 
-        eventChatListener = database.child("Events/$eventId/messages/").addChildEventListener(chatListener)
-
-//        val chatListener = object : ValueEventListener {
-//            override fun onDataChange(snapshot: DataSnapshot) {
-//                Log.d("MainRepository", "New message added to event chat")
-//                if(snapshot.value != null){
-//                    val messages = snapshot.value as MutableList<java.util.HashMap<String, String>>
-//                    eventChatCallback.onNewMessage(messages)
-//                }
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                Log.d("MainRepository", "Error occurred in database. ${error.toString()}")
-//            }
-//        }
-//
-//        eventChatListener = database.child("Events/$eventId/messages/").addValueEventListener(chatListener)
+        eventChatListener =
+            database.child("Events/$eventId/messages/").addChildEventListener(chatListener)
     }
 
     fun removeEventChatCallback() {
@@ -138,8 +121,12 @@ class MainRepository() {
         return database.child("Events").child(map["eventId"] as String).setValue(map)
     }
 
-    fun sendInvitation(userId: String, invitations: MutableList<String>) : Task<Void> {
-        return database.child("Users").child(userId).child("invitations").setValue(invitations)
+    fun sendInvitation(userId: String, invitation: String): Task<Void> {
+        return database.child("Users").child(userId).child("invitations").push().setValue(invitation)
+    }
+
+    fun addNewEventToUserEvents(eventId: String): Task<Void> {
+        return database.child("Users").child(firebaseAuth.uid.toString()).child("events").push().setValue(eventId)
     }
 
     fun getInvitations(userId: String) : Task<DataSnapshot> {
@@ -164,14 +151,9 @@ class MainRepository() {
         return database.child("Events").child(eventId).child("invitedList").setValue(invitedList)
     }
 
-    fun deleteInvitation(eventId: String, userId: String): Task<Void> {
-        //Delete an invitation from the invited list
-        return database.child("Events").child(eventId).child("invitedList").child(userId).removeValue()
-    }
-
-    fun removeInvitation(eventId: String): Task<Void> {
+    fun removeInvitation(invitations: HashMap<String, String>): Task<Void> {
         //Is this correct???
-        return database.child("Users").child(firebaseAuth.uid!!).child("invitations").removeValue()
+        return database.child("Users").child(firebaseAuth.uid!!).child("invitations").setValue(invitations)
     }
 
     fun setUsersEvents(events: MutableList<String>): Task<Void> {
@@ -184,6 +166,30 @@ class MainRepository() {
 
     fun sendMessageToEventChat(message: HashMap<String, String>, eventId: String): Task<Void> {
         return database.child("Events").child(eventId).child("messages").push().setValue(message)
+    }
+
+    fun sendFriendRequest(userId: String): Task<Void> {
+        return database.child("Users").child(userId).child("friendRequests").push().setValue(firebaseAuth.uid)
+    }
+
+    fun updateRequestedList(userId: String): Task<Void> {
+        return database.child("Users").child(firebaseAuth.uid!!).child("requestedFriends").push().setValue(userId)
+    }
+
+    fun addFriendToFriendsList(userId: String): Task<Void> {
+        return database.child("Users").child(firebaseAuth.uid!!).child("friends").push().setValue(userId)
+    }
+
+    fun removeFriendRequest(userId: String, key: String): Task<Void> {
+        return database.child("Users").child(firebaseAuth.uid!!).child("friendRequests").child(key).removeValue()
+    }
+
+    fun sendIdToNewFriend(userId: String): Task<Void> {
+        return database.child("Users").child(userId).child("friends").push().setValue(firebaseAuth.uid!!)
+    }
+
+    fun removeUserFromRequestedList(key: String): Task<Void> {
+        return database.child("Users").child(firebaseAuth.uid!!).child("requestedFriends").child(key).removeValue()
     }
 
 }

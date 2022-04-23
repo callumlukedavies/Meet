@@ -3,10 +3,10 @@
     android:id="@+id/userItemLinearLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="70dp"
     android:orientation="horizontal"
     android:background="#DDDDDD"
-    android:layout_margin="10dp"
+    android:layout_margin="5dp"
     android:padding="5dp"
     >
 
@@ -27,13 +27,24 @@
         />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/userItemButton"
+        android:id="@+id/rejectItemButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/add_friend_button_string"
+        android:text="@string/reject_request_string"
+        android:textAllCaps="false"
+        android:padding="10dp"
+        android:background="@drawable/main_button_white"
+        android:layout_margin="5dp"
+        />
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/acceptItemButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/accept_request_string"
         android:textAllCaps="false"
         android:padding="10dp"
         android:background="@drawable/main_button_pink"
+        android:layout_margin="5dp"
         />
 
 </LinearLayout>

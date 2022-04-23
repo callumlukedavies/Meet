@@ -7,69 +7,95 @@
     tools:context=".view.home.HomeActivity"
     android:background="#F8F8F8">
 
-    <LinearLayout
-        android:id="@+id/homeActivityFragmentContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+<!--    <LinearLayout-->
+<!--        android:id="@+id/homeActivityFragmentContainer"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="vertical"-->
 
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+
+<!--        />-->
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:name="androidx.navigation.fragment.NavHostFragment"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-
+        app:layout_constraintBottom_toTopOf="@id/bottomNavigationBar"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/navigation_graph"
         />
 
-    <LinearLayout
-        android:id="@+id/homeButtonLinearLayoutPanel"
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
 
+        style="@style/Widget.MaterialComponents.BottomNavigationView.Colored"
+        app:itemTextColor="@color/black"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        >
+        app:menu="@menu/nav_bar_menu"
+        />
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/calendarFragmentButton"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
-            android:background="#DDDDDD"
-            android:text="@string/calendar_button_string"
-            android:textAllCaps="false"
-            />
+<!--    <LinearLayout-->
+<!--        android:id="@+id/homeButtonLinearLayoutPanel"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/feedFragmentButton"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
-            android:background="#DDDDDD"
-            android:text="@string/feed_button_string"
-            android:textAllCaps="false"
-            />
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        >-->
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/friendsFragmentButton"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
-            android:text="@string/friends_button_string"
-            android:textAllCaps="false"
-            android:background="#CCCCCC"
-            />
+<!--        <androidx.appcompat.widget.AppCompatButton-->
+<!--            android:id="@+id/calendarFragmentButton"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:background="#DDDDDD"-->
+<!--            android:text="@string/calendar_button_string"-->
+<!--            android:textAllCaps="false"-->
+<!--            />-->
 
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/profileFragmentButton"
-            android:layout_width="0dp"
-            android:layout_height="50dp"
-            android:layout_weight="1"
-            android:background="#DDDDDD"
-            android:text="@string/profile_button_string"
-            android:textAllCaps="false"
-            />
-    </LinearLayout>
+<!--        <androidx.appcompat.widget.AppCompatButton-->
+<!--            android:id="@+id/feedFragmentButton"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:background="#DDDDDD"-->
+<!--            android:text="@string/feed_button_string"-->
+<!--            android:textAllCaps="false"-->
+<!--            />-->
+
+<!--        <androidx.appcompat.widget.AppCompatButton-->
+<!--            android:id="@+id/friendsFragmentButton"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:text="@string/friends_button_string"-->
+<!--            android:textAllCaps="false"-->
+<!--            android:background="#CCCCCC"-->
+<!--            />-->
+
+<!--        <androidx.appcompat.widget.AppCompatButton-->
+<!--            android:id="@+id/profileFragmentButton"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_weight="1"-->
+<!--            android:background="#DDDDDD"-->
+<!--            android:text="@string/profile_button_string"-->
+<!--            android:textAllCaps="false"-->
+<!--            />-->
+<!--    </LinearLayout>-->
 
 
 

@@ -27,6 +27,7 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
     private var messagesList: MutableList<Message>
     private lateinit var event: Event
     private lateinit var userName: String
+    private lateinit var invitations: HashMap<String, String>
     private var isUserAttending = false
     private var eventChatCallback: MainRepository.EventChatCallback
 
@@ -39,27 +40,35 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
         invitedListOfUsers = mutableListOf()
         attendingListOfUsers = mutableListOf()
         messagesList = mutableListOf()
+        invitations = hashMapOf()
         attendingListMutableLiveData = MutableLiveData()
         eventMutableLiveData = MutableLiveData()
         messagesListMutableLiveData = MutableLiveData()
         getEventFromDatabase(eventId)
-        getUserNameFromDatabase()
+        getUserDataFromDatabase()
         eventChatCallback = this
         mainRepository.addEventChatCallback(eventId, eventChatCallback)
 
     }
 
     fun removeEventChatCallback(){
+        //Stops the event chat from updating each time a new message is sent
         mainRepository.removeEventChatCallback()
     }
 
-    private fun getUserNameFromDatabase() {
+    private fun getUserDataFromDatabase() {
+        //gets the first and last name of the user, along with the invitations list
+        //from the users entry in the database
         mainRepository.getMyUserData().addOnCompleteListener {
             if (it.isSuccessful) {
                 Log.d("firebase Communications", "Get user name from database: Successful")
                 val firstName = it.result!!.child("firstName").value.toString()
                 val lastName = it.result!!.child("lastName").value.toString()
                 userName = "$firstName $lastName"
+
+                if(it.result!!.child("invitations").value != null)
+                    invitations = it.result!!.child("invitations").value as HashMap<String, String>
+                else invitations = hashMapOf()
             } else {
                 Log.d("firebase Communications", "Get user name from database: Unsuccessful")
             }
@@ -67,10 +76,12 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
     }
 
     private fun getEventFromDatabase(eventId: String){
+        //Gets the events details from the database
         mainRepository.getEventDetails(eventId).addOnCompleteListener {
             if(it.isSuccessful && it.result!!.value != null){
                 Log.d("Firebase Comms", "Successfully received event data")
 
+                //Check if messages exist for the event
                 val messages = if(it.result!!.child("messages").value == null) HashMap()
                 else it.result!!.child("messages").value as HashMap<String, HashMap<String, String>>
 
@@ -78,6 +89,7 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
                 val invitedList = if(it.result!!.child("invitedList").value == null) mutableListOf<String>()
                 else it.result.child("invitedList").value as MutableList<String>
 
+                //populate the Event object
                 event = Event(it.result!!.child("name").value.toString(),
                         it.result!!.child("date").value.toString(),
                         it.result!!.child("time").value.toString(),
@@ -110,18 +122,16 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
         }
     }
 
-    fun getEvent(): MutableLiveData<Event> {
-        return eventMutableLiveData
-    }
 
-    fun processIds(friendIdList : MutableList<String>, idType: Int) : MutableList<User>{
+    private fun processIds(friendIdList : MutableList<String>, idType: Int) : MutableList<User>{
+        //Processes the list of friend Id's and uses it to create User objects
         val list = mutableListOf<User>()
         for(id : String in friendIdList){
             mainRepository.getUserData(id).addOnCompleteListener{
                 if(it.isSuccessful){
                     val firstName = it.result!!.child("firstName").getValue().toString()
                     val lastName = it.result!!.child("lastName").getValue().toString()
-                    list.add(User(firstName, lastName, id))
+                    list.add(User(firstName, lastName, id, null))
                     if(id == firebaseAuth.uid && idType == 1){
                         println("User is attending event!")
                         isUserAttending = true
@@ -135,50 +145,21 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
         return list
     }
 
-    //Override EventChatCallback method onNewMessage
     override fun onNewMessage(key: String, message: HashMap<String, String>) {
-
+        //Handles new messages from the EventChatCallback interface
         Log.d("ViewEventViewModel","new message: ${message["time"]}")
         messagesList.add(Message(message["userName"]!!,
             message["time"]!!, message["message"]!!, message["userId"]!!))
         messagesListMutableLiveData.postValue(messagesList)
     }
 
-    //Override EventChatCallback method onError
     override fun onError(exception: Exception) {
+        //Handles errors from the EventChatCallback interface
         Log.d("ViewEventViewModel", "Error getting new message: $exception")
     }
 
-    fun processMessages(messagesList: HashMap<String, HashMap<String, String>>): MutableList<Message> {
-        val messages = mutableListOf<Message>()
-        for((key, value) in messagesList){
-            if(messagesList[key] != null) {
-                messages.add(
-                    Message(
-                        messagesList[key]?.get("userName")!!,
-                        messagesList[key]?.get("time")!!,
-                        messagesList[key]?.get("message")!!,
-                        messagesList[key]?.get("userId")!!
-                    )
-                )
-            }
-        }
-        return messages
-    }
-
-    fun getInvitedListMutableLiveData(): MutableLiveData<MutableList<User>> {
-        return invitedListMutableLiveData
-    }
-
-    fun getAttendingListMutableLiveData(): MutableLiveData<MutableList<User>> {
-        return attendingListMutableLiveData
-    }
-
-    fun getMessagesListMutableLiveData(): MutableLiveData<MutableList<Message>> {
-        return messagesListMutableLiveData
-    }
-
     fun sendMessageToEventChat(textMessage: String){
+        //Creates a message object and sends this to the event chat
         val milliseconds = System.currentTimeMillis()
         val calendar = Calendar.getInstance()
         calendar.timeInMillis = milliseconds
@@ -191,9 +172,6 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
         messageObject["userName"] = userName
         messageObject["time"] = time
         messageObject["userId"] = firebaseAuth.currentUser!!.uid
-//        event.eventMessages.add(messageObject)
-//        messagesList.add(Message(userName, time, textMessage, firebaseAuth.currentUser!!.uid))
-//        messagesListMutableLiveData.postValue(messagesList)
 
         mainRepository.sendMessageToEventChat(messageObject, event.eventId).addOnCompleteListener {
             if(it.isSuccessful){
@@ -205,8 +183,17 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
     }
 
     fun acceptInvitation(){
+        //Handles the necessary function calls to accept the invitation
+        //to the event that the user is viewing
         event.invitedList.remove(firebaseAuth.uid)
         firebaseAuth.uid?.let { event.attendingList.add(it) }
+
+        for((key, value) in invitations){
+            if(value == event.eventId){
+                invitations.remove(key)
+            }
+        }
+
         mainRepository.acceptInvitation(event.eventId, event.attendingList).addOnCompleteListener {
             if(it.isSuccessful){
                 Log.d("firebase comms: ", "User successfully accepted invitation")
@@ -223,7 +210,7 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
             }
         }
 
-        mainRepository.removeInvitation(event.eventId).addOnCompleteListener {
+        mainRepository.removeInvitation(invitations).addOnCompleteListener {
             if(it.isSuccessful){
                 Log.d("firebase comms: ", "User successfully removed invitation")
             } else {
@@ -231,27 +218,25 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
             }
         }
 
-        mainRepository.getUsersEvents().addOnCompleteListener {
+        mainRepository.addNewEventToUserEvents(event.eventId).addOnCompleteListener {
             if(it.isSuccessful){
-                Log.d("firebase comms", "successfully received users events.")
-                val events = if(it.result!!.value != null) it.result!!.value as MutableList<String>
-                else mutableListOf()
-                events.add(event.eventId)
-                mainRepository.setUsersEvents(events).addOnCompleteListener {
-                    if(it.isSuccessful){
-                        Log.d("firebase comms", "successfully added event to users events.")
-                    }else{
-                        Log.d("firebase comms", "Unable to add event to users events.")
-                    }
-                }
-            } else{
-                Log.d("firebase comms", "Unable to get users events.")
+                Log.d("firebase comms: ", "User successfully added event to events list")
+            } else {
+                Log.d("firebase comms: ", "User could not add event to events list")
             }
         }
     }
 
     fun rejectInvitation(){
+        //Handles the necessary function calls to reject the invitation to the event
+        //that the user is viewing
         event.invitedList.remove(firebaseAuth.uid)
+
+        val iterator = invitations.iterator()
+        while(iterator.hasNext()){
+            val value = iterator.next()
+            if(value.value == event.eventId) iterator.remove()
+        }
 
         mainRepository.updateInvitedList(event.eventId, event.invitedList).addOnCompleteListener {
             if(it.isSuccessful){
@@ -261,7 +246,7 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
             }
         }
 
-        mainRepository.removeInvitation(event.eventId).addOnCompleteListener {
+        mainRepository.removeInvitation(invitations).addOnCompleteListener {
             if(it.isSuccessful){
                 Log.d("firebase comms: ", "User successfully removed invitation")
             } else {
@@ -280,5 +265,21 @@ class ViewEventViewModel(application: Application, eventId: String) : AndroidVie
 
     fun getEventPlaceId(): String {
         return event.eventPlaceId
+    }
+
+    fun getEvent(): MutableLiveData<Event> {
+        return eventMutableLiveData
+    }
+
+    fun getInvitedListMutableLiveData(): MutableLiveData<MutableList<User>> {
+        return invitedListMutableLiveData
+    }
+
+    fun getAttendingListMutableLiveData(): MutableLiveData<MutableList<User>> {
+        return attendingListMutableLiveData
+    }
+
+    fun getMessagesListMutableLiveData(): MutableLiveData<MutableList<Message>> {
+        return messagesListMutableLiveData
     }
 }

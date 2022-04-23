@@ -48,7 +48,6 @@ class FriendListAdapter(private var users: MutableList<User>, private var friend
         } else {
             holder.userItemButton.visibility = View.GONE
         }
-
     }
 
     override fun getItemCount(): Int {
